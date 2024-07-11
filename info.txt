@@ -1,0 +1,130 @@
+General Information
+	This is a dataset of facial images of children.It contains 2 classes. The autistic class  are images
+	of children with autism. the non_autistic class contains images of children not diagnosed with autism.
+	The images in the dataset are rgb images of various image shapes. All are in jpg format
+	
+Motivation
+	I generated this dataset in hopes that I could train a CNN that could with high precision detect the
+	presence of autism or the abscence thereof from an image of the childs face. I have read a great number
+	of medical papers on the relationship of facial morphology  with respect to autism. In practice researchers
+	have used physical measurement methods to gather the morphological data. This is both time consuming and prone 
+	to error. Such methods have no practical use as a general  diagnosis  of autism. With the advances in neural
+	networks the use of morphological information present in a facial image would seem a viable approach to
+	achieving a low (actually zero) cost diagnostic peasily accessable diagnostic tool. This tool could be 
+	ported to a publicly accessable website that would enable parents to upload one or more images of their
+	child's face and be returned a probability as to the presence or abscence of autism
+	
+Dataset Development
+	I searched far and wide for a data base of facial images of autistic children. None to my knowledge exist.
+	I therefore had to develop the database from internet searches. Primarily I found these images on websites
+	devoted to the subject of autism. In general I had to download a particular image which in many cases were
+	group photos, then crop the image manually to the childs face. This is a tediuos and time consuming process
+	particularly when you consider needing thousands of images. Further in many cases the cropped facial image
+	was of poor quality in several aspects. For one the facial image may not be a total straght on facial image  
+	but may be partially in profile. Many images were of a small size and so lacked detail of the facial morphology.
+	Other variances like lighting conains, rotation angle and others were also present.
+	As a result the dataset is not of the highest quality but none the less is a reasonable starting point.
+	I contacted numerous organizations associated with autism to try to get assistance in developing a higher
+	quality dataset but was unsuccessful. Also not  that there is a possibility that images in the non_autistic 
+	folders may have some percentage of autistic images. This is because you can not search the internet for
+	'facial images of non autistic children' so I was forced to just gather facial images of children. Some percentage
+	of these children(probably a small precentage) could have autism.
+	
+Dataset sources of errors in the trained model
+	The theory behind my approach is that the morphology of the face has structural features that can be used to detect
+	the presence of autism. This has shown to be true by research conducted by medical practioners and published in
+	peer reviewed papers. In the data set (unfortunately) the images are of various sizes as a consequence of gathering
+	the images from google searches and downloads from various autism focussed websites. Now in training the model
+	it is necessary that all images be of the same shape. Therefore  all the images must be reshaped to the same size.
+	I used iimages of size (200 X 200 ) to train the model. When the images are resized, the original images aspect ratio  
+	is lost. Consequently each image is "distorted" from its original form and thus the morphology of the image is   
+	distorted uniquely for each image. This "distortion" may negatively impact the models performance.
+	
+Folder and File Information
+	Test folder:
+		The test folder  contains the images used to test the model after it has been trained.
+		It contains two subfolders labelled as autistic and non_autistic. Each subfolder contains
+		100 images of size 224 X 224 X3 in jpg format. The autistic subfloder contains the facial images of
+		children diagnosed as autistic. The non_autistic folder contains facial images of children randomly
+		gathered from internet searches.
+		
+	Valid folder
+		The valid folder contains the validation images used during the training of the model to measure the
+		models validation performance. It is structured in the same manner os the test folder
+	
+	Train folder:
+		The train folder contains the images used to train the model. It is structured like the test folder.
+		Each subffolder contains 1263 images
+		
+	Consolidated folder
+		This folder consolidates the images from the train, test and valid folders into a single consolidated folder.
+		Each subfolder of the consolidated folder contains 1463 images. This folder is useful if you wish to
+		generate your own train, test and validation sets.
+		
+	autism-B3_87.0.h5
+		This file is an EfficientNet B3 trained model. It achieved an accuracy on the test set of 87.5 %. on the test set.  
+		This model was trained on (200 X 200 X 3) rgb images, it can be loaded into tensorflow and used for predictions. 
+		Note: Efficient net models expect  pixels in the range of 0 to 255. Note when doing predictions, a prediction
+		of 0 implies autistic image and a predication of 1 implies non_autistic image
+		
+	autism.csv
+		This csv file has 2926 rows, one row for each image in the train, test and valid folders
+		The file has 3 columns filepaths, labels and dataset.
+		the filepath entries are the relative paths to the image file. An example entry would be
+		test/autistic/001.jpg where test means the file is within the autistic subfolder of the test folder.
+		The entries in the label column is the label(autistic non_autistic) associated with the image file.
+		Entries in the data set colun indicate which main folder the image resides in (train test or valid)
+		
+	autism.ipynb
+		This is a jupyter notebook for the phyton code that was run and resulted in the trained model autism-B3_88.0.h5
+		using the train, test and validation image datasets.
+		
+	face_crop.ipynb
+		This is a jupyter note of the pyhton code to detect and crop the faces in an image. The code contains a function
+		that processes image files in a specified directory, detects if a face is present in the image, crops the image
+		to just that of the face and saves the images to a specified directory. Several options are provided to resize
+		the cropped image before it is saved. This is useful if you are trying to collect facial images from internet
+		search. USe this function to crop the download images. Note if you use the trained model to predict on images 
+		it is best to first crop the images and set the resize option to the same size as those used to train the model
+		
+	
+	averaging_predictor.ipynb
+		This is a jupyter notebook of the python code that uses a trained model to do predictions on images. The function
+		does predictions on all images in a specified directory and prints out the results. It has two modes of operation.
+		In the non_averaging mode a seperate prediction is made for each image and the resultant predictedclass and its probability  
+		are printed out for each image. In the averaging mode a prediction is made on each image and the probabilities are stored.  
+		When the predictions for all images are completed the probabilites are summed for each class.  
+		The class having the highest probability sum is then select as the class prediction for all images. The predicted class 
+		is printed out along with its averaged probability.
+		Lets say you have 10 images of the face of the same child and you want to get a prediction if the child is autistic.
+		You can get 10 individual prediction and look at each prediction. Alternatively you wiill get a much higher confidence
+		prediction using the predictor in the averaging mode for the 10 images. 
+		Of course you can just predict on one image of a childs face but you get a much higher confidence if you use multiple
+		facial images of the child and use the predictor in the averaging mode.
+		
+	classes.txt
+		this text file is produced when the autism.ipynb notebook is run.  This file is required by the averaging_predictor notebook  
+		in oder to process predictions on the images to be classified
+		
+	tests_non_autistic	folder
+		This folder contains 5 image files. Files 006,007,008 and 010 are images of non_autistic children. Image 009 is an image
+		of an austic child. This folder is used as input to the averaging_predictor notebook to demonstrate its use
+		
+	images to crop folder	
+		This folder has 4 image files. This folder is used to demonstrate the face_crop notebook. Image 4 is one in which no  
+		face will be detected and so will not be cropped and save. Image 3 return as small size cropped image. With function  
+		parameter min_size=100 it  is to small and will not be saved
+		
+	HOW TO USE THE NOTEBOOKS
+		To use the includes notebooks as is create a directory in your C drive called temp. Within the temp directory create a  
+		subdirectory called austim. Then copy the directories
+		train, test, valid, consolidated, images to crop, tests_non_autistic to the autism sub directory.
+		Also copy the files autism-B3_87.0.h5, autism.csv, and classes.txt to the autism directory.
+		If you are using jupyter notebook place the .ipynb file in a location so they can be accessed by your notebook.
+		NOTE: THE NOTEBOOKS AUTISM AND AVERAGING_PREDICTOR ARE GENERAL PURPOSE NOTEBOOKS THEY WILL WORK WITH ANY DATASET THAT HAS
+		train, test and valid dataset (must be folders train, test and valid) that are organized with class sub directories for  
+		each class.
+		
+		
+	
+	
